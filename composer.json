@@ -1,0 +1,19 @@
+{
+    "name": "hoaaah/yii2-micro",
+    "description": "MicroFramework Template with Yii2",
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "authors": [
+        {
+            "name": "Arief Wijaya",
+            "email": "hoaaah.arief@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
