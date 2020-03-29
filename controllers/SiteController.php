@@ -29,13 +29,23 @@ class SiteController extends Controller
     {
         $post = Post::find()->all();
         return [
-            'status' => 'success',
+            'status' => Status::STATUS_OK,
             'message' => 'Hello :)',
             'data' => $post
         ];
     }
 
     
+    public function actionView($id)
+    {
+        $post = Post::findOne($id);
+        return [
+            'status' => Status::STATUS_FOUND,
+            'message' => 'Data Found',
+            'data' => $post
+        ];
+    }
+
     public function actionSignup()
     {
         $model = new User();
