@@ -77,10 +77,10 @@ https://YOUR-API-URL/view?id={id} | GET| View a post
 https://YOUR-API-URL/login | POST | Login with username and password
 https://YOUR-API-URL/signup | POST | Signup with username, email and password
 https://YOUR-API-URL/v1/post | GET | List all post created
-https://YOUR-API-URL/v1/create | POST | Create a new post (title, body)
-https://YOUR-API-URL/v1/update?id={id} | PUT / PATCH | Update a post (title, body)
-https://YOUR-API-URL/v1/delete?id={id} | DELETE | Delete a post
-https://YOUR-API-URL/v1/view?id={id} | GET | View a post 
+https://YOUR-API-URL/v1/post/create | POST | Create a new post (title, body)
+https://YOUR-API-URL/v1/post/update?id={id} | PUT / PATCH | Update a post (title, body)
+https://YOUR-API-URL/v1/post/delete?id={id} | DELETE | Delete a post
+https://YOUR-API-URL/v1/post/view?id={id} | GET | View a post 
 
 
 ## API versioning
