@@ -1,6 +1,6 @@
 {
-    "name": "hoaaah/yii2-micro",
-    "description": "MicroFramework Template with Yii2",
+    "name": "hoaaah/yii2-rest-api-template",
+    "description": "REST API Template with Yii2",
     "require": {
         "yiisoft/yii2": "~2.0.0"
     },
