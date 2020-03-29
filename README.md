@@ -89,14 +89,14 @@ This template give you versioning scenario based on module application. In Yii2 
 
 # TODO
 Feel free to contribute if you have any idea.
-[x] Rest API Template
-[x] Login and signup in SiteController
-[x] Example of versioning and Blog Scenario
-[] Authentication Type from params
-[] Rate Limiter from params
-[] Change auth_key for every login
-[] Auth_key have expiration
-[] each auth_key have application token
+- [x] Rest API Template
+- [x] Login and signup in SiteController
+- [x] Example of versioning and Blog Scenario
+- [] Authentication Type from params
+- [] Rate Limiter from params
+- [] Change auth_key for every login
+- [] Auth_key have expiration
+- [] each auth_key have application token
 
 
 # Creator
