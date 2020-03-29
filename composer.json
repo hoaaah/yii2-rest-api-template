@@ -1,6 +1,7 @@
 {
     "name": "hoaaah/yii2-rest-api-template",
     "description": "REST API Template with Yii2",
+    "license": "Apache-2.0",
     "require": {
         "yiisoft/yii2": "~2.0.0"
     },
