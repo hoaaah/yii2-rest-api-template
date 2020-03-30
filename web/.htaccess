@@ -12,4 +12,5 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # Otherwise forward the request to index.php
 RewriteRule . index.php
 
+# If your PHP running as Fast-CGI
 SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
