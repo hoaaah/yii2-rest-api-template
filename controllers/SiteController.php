@@ -106,7 +106,8 @@ class SiteController extends Controller
                 'message' => 'Login Succeed, save your token',
                 'data' => [
                     'id' => $user->username,
-                    'token' => $user->auth_key
+                    'token' => $user->auth_key,
+                    'email' => $user['email'],
                 ]
             ];
         } else {
