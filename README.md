@@ -67,6 +67,42 @@ This template support 3 most used authentication. (Actually it's not me who make
 2. Query parameter: the access token is sent as a query parameter in the API URL, e.g., https://example.com/users?access-token=xxxxxxxx. Because most Web servers will keep query parameters in server logs, this approach should be mainly used to serve JSONP requests which cannot use HTTP headers to send access tokens.
 3. OAuth 2: the access token is obtained by the consumer from an authorization server and sent to the API server via HTTP Bearer Tokens, according to the OAuth2 protocol.
 
+## Global Configuration of AuthMethods and RateLimiter
+This template provide global configuration to set your application supported authMethods. You can find global configuration from `app\config\params.php`. Set your supported authMethods and RateLimiter from this file.
+
+```php
+return [
+    'useHttpBasicAuth' => true,
+    'useHttpBearerAuth' => true,
+    'useQueryParamAuth' => true,
+    'useRateLimiter' => false,
+];
+```
+
+Example use in behaviors looks like this
+
+```php
+use app\helpers\BehaviorsFromParamsHelper;
+use yii\rest\ActiveController;
+
+class PostController extends ActiveController
+{
+    public $modelClass = 'app\models\Post';
+
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors = BehaviorsFromParamsHelper::behaviors($behaviors);
+        // if you need other behaviors method use like this
+        // $behaviors['otherMethods'] = $value;
+        return $behaviors;
+    }
+}
+```
+
+### Ratelimiter
+To enable your ratelimiter configuration, please follow official guide from [Yii documentation](https://www.yiiframework.com/doc/guide/2.0/en/rest-rate-limiting).
+
 ## Auth Scenario
 This template already have basic endpoint that you can use to start your REST-API. Such as:
 
@@ -92,9 +128,9 @@ Feel free to contribute if you have any idea.
 - [x] Rest API Template
 - [x] Login and signup in SiteController
 - [x] Example of versioning and Blog Scenario
-- [ ] Authentication Type from params
-- [ ] Rate Limiter from params
-- [ ] Change auth_key for every login
+- [x] Authentication Type from params
+- [x] Rate Limit from params
+- [x] Change auth_key for every login
 - [ ] Auth_key have expiration
 - [ ] each auth_key have application token
 
