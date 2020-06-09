@@ -101,6 +101,8 @@ class SiteController extends Controller
         $user = User::findByUsername($params['username']);
 
         if ($user->validatePassword($params['password'])) {
+            $user->generateAuthKey();
+            $user->save();
             return [
                 'status' => Status::STATUS_FOUND,
                 'message' => 'Login Succeed, save your token',
