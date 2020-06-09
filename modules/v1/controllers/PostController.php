@@ -2,16 +2,13 @@
 
 namespace app\modules\v1\controllers;
 
-use yii\filters\auth\CompositeAuth;
-use yii\filters\auth\HttpBasicAuth;
-use yii\filters\auth\HttpBearerAuth;
-use yii\filters\auth\QueryParamAuth;
+use app\helpers\BehaviorsFromParamsHelper;
 use yii\rest\ActiveController;
 
 /*
- * Created on Thu Feb 22 2018
- * By Heru Arief Wijaya
- * Copyright (c) 2018 belajararief.com
+ *
+ * @author Heru Arief Wijaya
+ * 2020 @  belajararief.com
  */
 
 class PostController extends ActiveController
@@ -21,14 +18,7 @@ class PostController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => CompositeAuth::className(),
-            'authMethods' => [
-                HttpBasicAuth::className(),
-                HttpBearerAuth::className(),
-                QueryParamAuth::className(),
-            ],
-        ];
+        $behaviors = BehaviorsFromParamsHelper::behaviors($behaviors);
         return $behaviors;
     }
 }
