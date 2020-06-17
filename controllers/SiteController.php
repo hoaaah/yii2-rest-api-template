@@ -50,11 +50,14 @@ class SiteController extends Controller
     {
         $model = new User();
         $params = Yii::$app->request->post();
-        if(!$params) return [
-            'status' => Status::STATUS_BAD_REQUEST,
-            'message' => "Need username, password, and email.",
-            'data' => ''
-        ];
+        if(!$params) {
+            Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
+            return [
+                'status' => Status::STATUS_BAD_REQUEST,
+                'message' => "Need username, password, and email.",
+                'data' => ''
+            ];
+        }
 
 
         $model->username = $params['username'];
@@ -65,6 +68,7 @@ class SiteController extends Controller
         $model->status = User::STATUS_ACTIVE;
 
         if ($model->save()) {
+            Yii::$app->response->statusCode = Status::STATUS_CREATED;
             $response['isSuccess'] = 201;
             $response['message'] = 'You are now a member!';
             $response['user'] = \app\models\User::findByUsername($model->username);
@@ -74,7 +78,7 @@ class SiteController extends Controller
                 'data' => User::findByUsername($model->username),
             ];
         } else {
-            //$model->validate();
+            Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
             $model->getErrors();
             $response['hasErrors'] = $model->hasErrors();
             $response['errors'] = $model->getErrors();
@@ -101,6 +105,7 @@ class SiteController extends Controller
         $user = User::findByUsername($params['username']);
 
         if ($user->validatePassword($params['password'])) {
+            Yii::$app->response->statusCode = Status::STATUS_FOUND;
             $user->generateAuthKey();
             $user->save();
             return [
@@ -113,6 +118,7 @@ class SiteController extends Controller
                 ]
             ];
         } else {
+            Yii::$app->response->statusCode = Status::STATUS_UNAUTHORIZED;
             return [
                 'status' => Status::STATUS_UNAUTHORIZED,
                 'message' => 'Username and Password not found. Check Again!',
