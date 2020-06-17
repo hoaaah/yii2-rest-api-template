@@ -42,6 +42,7 @@ class User extends UserIdentity
             ['username', 'required'],
             ['username', 'string', 'min' => 2, 'max' => 255],        
             ['username', 'unique'],
+            [['consumer', 'access_given'], 'safe'],
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],

@@ -17,6 +17,8 @@ use Yii;
  * @property string  $password_hash
  * @property string  $password_reset_token
  * @property string  $email
+ * @property string  $consumer
+ * @property string  $access_given
  * @property string  $account_activation_token
  * @property string  $auth_key
  * @property integer $status
@@ -25,6 +27,7 @@ use Yii;
  */
 class UserIdentity extends ActiveRecord implements IdentityInterface
 {
+    public $consumer;
     /**
      * Declares the name of the database table associated with this AR class.
      *
@@ -61,7 +64,10 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        return static::findOne(['auth_key' => $token, 'status' => User::STATUS_ACTIVE]);
+        $accessToken = AccessToken::find()->where(['token' => $token])->andWhere(['>', 'expire_at', strtotime('now')])->one();
+        if(!$accessToken) return $accessToken;
+        return User::findOne(['id' => $accessToken->user_id]);
+        // return User::findOne(['auth_key' => $token, 'status' => User::STATUS_ACTIVE]);
     }
 
     /**
@@ -109,6 +115,7 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
+        AccessToken::generateAuthKey($this);
     }
 
     /**
