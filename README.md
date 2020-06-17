@@ -118,6 +118,24 @@ https://YOUR-API-URL/v1/post/update?id={id} | PUT / PATCH | Update a post (title
 https://YOUR-API-URL/v1/post/delete?id={id} | DELETE | Delete a post
 https://YOUR-API-URL/v1/post/view?id={id} | GET | View a post 
 
+## Access Token Management
+This application manage token via access_token table. Access Token have certain expiration based on $tokenExpiration value. Default Token Expiration are in seconds.
+
+```php 
+public $tokenExpiration = 60 * 24 * 365; // in seconds
+```
+
+In certain case you want to make a token expire before given tokenExpiration. Use ```expireThisToken()``` method to achieve it.
+```php
+$accessToken = AccessToken::findOne(['token' => $token]);
+$accessToken->expireThisToken();
+```
+
+Or you want to make all tokens from certain user expire, use ```makeAllUserTokenExpiredByUserId($userId)``` method to achieve it.
+```php 
+$user = Yii::$app->user->identity; // or User::findOne($id)
+AccessToken::makeAllUserTokenExpiredByUserId($user->id);
+```
 
 ## API versioning
 This template give you versioning scenario based on module application. In Yii2 a module are self-contained software units that consist of model, views, controllers and other supporting components. This template already have v1 module, it means all of endpoint for API v1 created in this module. When you publish a new API version (that break backward compatibility / BBC), you can create a new module. For more information create a module, you can visit this [Yii2 Guide on Creating Module](https://www.yiiframework.com/doc/guide/2.0/en/structure-modules).
@@ -131,8 +149,8 @@ Feel free to contribute if you have any idea.
 - [x] Authentication Type from params
 - [x] Rate Limit from params
 - [x] Change auth_key for every login
-- [ ] Auth_key have expiration
-- [ ] each auth_key have application token
+- [x] Auth_key have expiration
+- [x] each auth_key have application token
 
 
 # Creator
