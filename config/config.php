@@ -19,13 +19,13 @@ return [
     'modules' => [
         'v1' => [
             'class' => 'app\modules\v1\v1',
-        ],   
+        ],
     ],
     // this is where the application will find all controllers
     'controllerNamespace' => 'app\controllers',
     // set an alias to enable autoloading of classes from the 'micro' namespace
     'aliases' => [
-        '@app' => __DIR__.'/../',
+        '@app' => __DIR__ . '/../',
     ],
     'components' => [
         'urlManager' => [
@@ -33,7 +33,7 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '<alias:\w+>' => 'site/<alias>',            
+                '<alias:\w+>' => 'site/<alias>',
             ],
         ],
         'user' => [
@@ -47,6 +47,13 @@ return [
                 'application/json' => 'yii\web\JsonParser',
             ],
             'enableCsrfCookie' => false,
+        ],
+        'response' => [
+            'formatters' => [
+                \yii\web\Response::FORMAT_JSON => [
+                    'class' => 'yii\web\JsonResponseFormatter',
+                ],
+            ],
         ],
         'db' => $db,
     ],

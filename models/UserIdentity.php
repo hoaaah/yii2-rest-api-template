@@ -1,9 +1,11 @@
 <?php
+
 namespace app\models;
 
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use yii\base\NotSupportedException;
 use Yii;
 
 /**
@@ -13,21 +15,22 @@ use Yii;
  * extend from User model.
  *
  * @property integer $id
- * @property string  $username
- * @property string  $password_hash
- * @property string  $password_reset_token
- * @property string  $email
- * @property string  $consumer
- * @property string  $access_given
- * @property string  $account_activation_token
- * @property string  $auth_key
+ * @property string $username
+ * @property string $password_hash
+ * @property string $password_reset_token
+ * @property string $email
+ * @property string $consumer
+ * @property string $access_given
+ * @property string $account_activation_token
+ * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
  */
 class UserIdentity extends ActiveRecord implements IdentityInterface
 {
-    public $consumer;
+    public string $consumer;
+
     /**
      * Declares the name of the database table associated with this AR class.
      *
@@ -45,10 +48,10 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
     /**
      * Finds an identity by the given ID.
      *
-     * @param  int|string $id The user id.
+     * @param int|string $id The user id.
      * @return IdentityInterface|static
      */
-    public static function findIdentity($id)
+    public static function findIdentity($id): IdentityInterface|static
     {
         return static::findOne(['id' => $id, 'status' => User::STATUS_ACTIVE]);
     }
@@ -56,18 +59,15 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
     /**
      * Finds an identity by the given access token.
      *
-     * @param  mixed $token
-     * @param  null  $type
-     * @return void|IdentityInterface
-     * 
-     * @throws NotSupportedException
+     * @param mixed $token
+     * @param null $type
+     * @return ActiveRecord|array
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function findIdentityByAccessToken($token, $type = null): array|ActiveRecord
     {
         $accessToken = AccessToken::find()->where(['token' => $token])->andWhere(['>', 'expire_at', strtotime('now')])->one();
-        if(!$accessToken) return $accessToken;
-        return User::findOne(['id' => $accessToken->user_id]);
-        // return User::findOne(['auth_key' => $token, 'status' => User::STATUS_ACTIVE]);
+        if (!$accessToken) return $accessToken;
+        return User::findOne(['id' => $accessToken->user_id, 'status' => User::STATUS_ACTIVE]);
     }
 
     /**
@@ -75,7 +75,7 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
      *
      * @return int|mixed|string
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->getPrimaryKey();
     }
@@ -89,18 +89,18 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
      *
      * @return string
      */
-    public function getAuthKey()
+    public function getAuthKey(): string
     {
         return $this->auth_key;
     }
 
     /**
      * Validates the given auth key.
-     * 
-     * @param  string  $authKey The given auth key.
+     *
+     * @param string $authKey The given auth key.
      * @return boolean          Whether the given auth key is valid.
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
         return $this->getAuthKey() === $authKey;
     }
@@ -110,7 +110,8 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
 //------------------------------------------------------------------------------------------------//
 
     /**
-     * Generates "remember me" authentication key. 
+     * Generates "remember me" authentication key.
+     * @throws Exception
      */
     public function generateAuthKey()
     {
@@ -121,12 +122,11 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
     /**
      * Validates password.
      *
-     * @param  string $password
+     * @param string $password
      * @return bool
-     * 
-     * @throws \yii\base\InvalidConfigException
+     *
      */
-    public function validatePassword($password)
+    public function validatePassword(string $password): bool
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
@@ -134,12 +134,12 @@ class UserIdentity extends ActiveRecord implements IdentityInterface
     /**
      * Generates password hash from password and sets it to the model.
      *
-     * @param  string $password
-     * 
-     * @throws \yii\base\Exception
-     * @throws \yii\base\InvalidConfigException
+     * @param string $password
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    public function setPassword($password)
+    public function setPassword(string $password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }

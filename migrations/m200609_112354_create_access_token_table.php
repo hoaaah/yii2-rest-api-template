@@ -9,6 +9,7 @@ class m200609_112354_create_access_token_table extends Migration
 {
     /**
      * {@inheritdoc}
+     * @throws \yii\base\Exception
      */
     public function safeUp()
     {
