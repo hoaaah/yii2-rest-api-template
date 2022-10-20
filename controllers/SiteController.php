@@ -6,8 +6,12 @@ use app\models\Post;
 use app\models\User;
 use app\models\Status;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\rest\Controller;
 use yii\web\ErrorAction;
+use yii\web\Request;
+use yii\web\Response;
 
 /*
  * Created on Thu Feb 22 2018
@@ -16,16 +20,32 @@ use yii\web\ErrorAction;
  */
 
 class SiteController extends Controller
-{    
-    protected function verbs()
+{
+
+    public function behaviors(): array
     {
-       return [
-           'signup' => ['POST'],
-           'login' => ['POST'],
-       ];
+        $behaviors = parent::behaviors();
+        $behaviors['contentNegotiator'] = [
+            'class' => 'yii\filters\ContentNegotiator',
+            'formats' => [
+                'application/json' => Response::FORMAT_JSON,
+            ]
+        ];
+        return $behaviors;
     }
 
-    public function actionIndex()
+    protected function verbs(): array
+    {
+        return [
+            'signup' => ['POST'],
+            'login' => ['POST'],
+            'index' => ['GET'],
+            'view' => ['POST']
+
+        ];
+    }
+
+    public function actionIndex(): array
     {
         $post = Post::find()->all();
         return [
@@ -35,68 +55,56 @@ class SiteController extends Controller
         ];
     }
 
-    
-    public function actionView($id)
+
+    public function actionView($id): array
     {
         $post = Post::findOne($id);
+
         return [
-            'status' => Status::STATUS_FOUND,
-            'message' => 'Data Found',
+            'status' => ($post instanceof Post) ? Status::STATUS_FOUND : Status::STATUS_NOT_FOUND,
+            'message' => ($post instanceof Post) ? Status::STATUS_SUCCESS : Status::STATUS_ERROR,
             'data' => $post
         ];
     }
 
-    public function actionSignup()
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function actionSignup(Request $request): array|string
     {
         $model = new User();
-        $params = Yii::$app->request->post();
-        if(!$params) {
-            Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
-            return [
-                'status' => Status::STATUS_BAD_REQUEST,
-                'message' => "Need username, password, and email.",
-                'data' => ''
-            ];
-        }
-
-
-        $model->username = $params['username'];
-        $model->email = $params['email'];
-
-        $model->setPassword($params['password']);
-        $model->generateAuthKey();
         $model->status = User::STATUS_ACTIVE;
-
+        $response = [];
+        $password = $request->post('password');
+        $validatePasswordStrength = $model->validatePasswordStrength($password);
+        if ($model->load($request->post()) and $model->validate() and $validatePasswordStrength['error']) {
+            $response['status'] = Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
+            $response['message'] = "Need username, password, and email.";
+            $response['hasErrors'] = true;
+            $response['errors'] = array_merge($model->getErrors(), $validatePasswordStrength['message']);
+            return $response;
+        }
+        $model->setPassword($password);
+        $model->generateAuthKey();
         if ($model->save()) {
-            Yii::$app->response->statusCode = Status::STATUS_CREATED;
+            $response['status'] = Yii::$app->response->statusCode = Status::STATUS_CREATED;
             $response['isSuccess'] = 201;
             $response['message'] = 'You are now a member!';
-            $response['user'] = \app\models\User::findByUsername($model->username);
-            return [
-                'status' => Status::STATUS_CREATED,
-                'message' => 'You are now a member',
-                'data' => User::findByUsername($model->username),
-            ];
-        } else {
-            Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
-            $model->getErrors();
-            $response['hasErrors'] = $model->hasErrors();
-            $response['errors'] = $model->getErrors();
-            return [
-                'status' => Status::STATUS_BAD_REQUEST,
-                'message' => 'Error saving data!',
-                'data' => [
-                    'hasErrors' => $model->hasErrors(),
-                    'getErrors' => $model->getErrors(),
-                ]
-            ];
+            $response['user'] = $model->findByUsername($model->username);
+            return $response;
         }
+        $response['status'] = Yii::$app->response->statusCode = Status::STATUS_BAD_REQUEST;
+        $response['message'] = 'Error saving your data';
+        $response['hasErrors'] = $model->hasErrors();
+        $response['errors'] = $model->getErrors();
+        return $response;
     }
 
     public function actionLogin()
     {
         $params = Yii::$app->request->post();
-        if(empty($params['username']) || empty($params['password'])) return [
+        if (empty($params['username']) || empty($params['password'])) return [
             'status' => Status::STATUS_BAD_REQUEST,
             'message' => "Need username and password.",
             'data' => ''
@@ -105,8 +113,8 @@ class SiteController extends Controller
         $user = User::findByUsername($params['username']);
 
         if ($user->validatePassword($params['password'])) {
-            if(isset($params['consumer'])) $user->consumer = $params['consumer'];
-            if(isset($params['access_given'])) $user->access_given = $params['access_given'];
+            if (isset($params['consumer'])) $user->consumer = $params['consumer'];
+            if (isset($params['access_given'])) $user->access_given = $params['access_given'];
 
             Yii::$app->response->statusCode = Status::STATUS_FOUND;
             $user->generateAuthKey();

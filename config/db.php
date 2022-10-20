@@ -3,8 +3,8 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2-rest-api',
-    'username' => 'root',
-    'password' => '',
+    'dsn' => 'pgsql:host=postgres;dbname=api_test',
+    'username' => 'postgres',
+    'password' => 'P455w0r6_postgres',
     'charset' => 'utf8',
 ];
